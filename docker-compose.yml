@@ -317,6 +317,34 @@ services:
       links:
         - docker-in-docker
 
+### GOLANG ################################################
+    golang:
+      build:
+        context: ./golang
+        args:
+          - CHANGE_SOURCE=${CHANGE_SOURCE}
+          - GOLANG_BASE_IMAGE_TAG_PREFIX=${GOLANG_BASE_IMAGE_TAG_PREFIX}
+          - http_proxy
+          - https_proxy
+          - no_proxy
+      volumes:
+        - ../../go:/go
+        - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
+        - docker-in-docker:/certs/client
+      expose:
+        - ${GOLANG_PORT}
+      extra_hosts:
+        - "dockerhost:${DOCKER_HOST_IP}"
+      environment:
+        - DOCKER_HOST=tcp://docker-in-docker:2376
+        - DOCKER_TLS_VERIFY=1
+        - DOCKER_TLS_CERTDIR=/certs
+        - DOCKER_CERT_PATH=/certs/client
+      networks:
+        - backend
+      links:
+        - docker-in-docker
+
 ### PHP Worker ############################################
     php-worker:
       build:
@@ -435,8 +463,8 @@ services:
         - "${NGINX_HOST_HTTP_PORT}:80"
         - "${NGINX_HOST_HTTPS_PORT}:443"
         - "${VARNISH_BACKEND_PORT}:81"
-      depends_on:
-        - php-fpm
+      # depends_on:
+      #   - php-fpm
       networks:
         - frontend
         - backend
@@ -2093,3 +2121,11 @@ services:
         - frontend
         - backend
       restart: always
+
+  ### akhq ####################################################
+    akhq:
+      image: tchiotludo/akhq
+      volumes:
+        - ./akhq/application.yml:/app/application.yml
+      ports:
+        - "${AKHQ_PORT}:8080"
