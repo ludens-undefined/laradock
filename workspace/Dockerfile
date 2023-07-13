@@ -189,6 +189,18 @@ RUN echo "" >> ~/.bashrc && \
     echo 'export PATH="/var/www/vendor/bin:$PATH"' >> ~/.bashrc
 
 ###########################################################################
+# GRPC:
+###########################################################################
+
+USER root
+
+COPY ./protobuf_grpc /usr/local/grpc/protobuf_grpc
+ENV GRPC_PHP_PLUGIN="/usr/local/grpc/protobuf_grpc"
+
+RUN pecl install grpc && \
+  pecl install protobuf
+  
+###########################################################################
 # Crontab
 ###########################################################################
 

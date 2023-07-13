@@ -74,6 +74,18 @@ RUN set -xe; \
 #
 
 ###########################################################################
+# GRPC:
+###########################################################################
+
+COPY ./protobuf_grpc /usr/local/grpc/protobuf_grpc
+ENV GRPC_PHP_PLUGIN="/usr/local/grpc/protobuf_grpc"
+
+USER root
+
+RUN pecl install grpc && \
+    pecl install protobuf
+
+###########################################################################
 # BZ2:
 ###########################################################################
 
@@ -1050,7 +1062,7 @@ RUN if [ ${INSTALL_WKHTMLTOPDF} = true ]; then \
       xfonts-base \
       xfonts-75dpi \
       wget \
-    && wget "https://github.com/wkhtmltopdf/packaging/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_0.12.6-1.stretch_${ARCH}.deb" \
+  && wget "https://github.com/wkhtmltopdf/packaging/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_${WKHTMLTOPDF_VERSION}.stretch_${ARCH}.deb" \
     && dpkg -i "wkhtmltox_${WKHTMLTOPDF_VERSION}.stretch_${ARCH}.deb" \
     && apt -f install \
 ;fi
